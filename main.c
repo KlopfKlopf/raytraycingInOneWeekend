@@ -7,7 +7,7 @@
 int main(void) {
     
     double aspect_ratio = (16.0/9.0);
-    int image_width = 60;
+    int image_width = 400;
     
     // Calculate the image height; and ensure that it is at least 1.
     int image_height = (int)(image_width/aspect_ratio);
@@ -18,8 +18,8 @@ int main(void) {
     //Camera
 
     double focal_length = 1.0;
-    double viewport_height = 1.0;
-    double viewport_width = viewport_height * ((double)image_width/image_height);
+    double viewport_height = 2.0;
+    double viewport_width = viewport_height * (((double)image_width)/image_height);
     Vec3 camera_center = {0, 0, 0};
     Vec3 focal_point = {0, 0, focal_length};
 
@@ -36,10 +36,8 @@ int main(void) {
 
     //Calculate the location opf the upper left pixel.
     Vec3 camera_on_viewport_center = vec3_subtract(&camera_center, &focal_point);
-    Vec3 viewport_corner = vec3_subtract(&viewport_u_half, &viewport_v_half);
-    Vec3 viewport_upper_left = vec3_subtract(&camera_on_viewport_center, &viewport_corner);
-    
-    printf("Upper Left (%f, %f, %f)\n", viewport_upper_left.x, viewport_upper_left.y, viewport_upper_left.z); 
+    Vec3 camera_on_leftside = vec3_subtract(&camera_on_viewport_center, &viewport_u_half);
+    Vec3 viewport_upper_left = vec3_subtract(&camera_on_leftside, &viewport_v_half);
     Vec3 pixel_delta_point = vec3_add(&pixel_delta_u, &pixel_delta_v);
     Vec3 pixel_padding = vec3_scalar_multiply(0.5, &pixel_delta_point);
     Vec3 pixel00_loc = vec3_add(&viewport_upper_left, &pixel_padding);
@@ -61,7 +59,6 @@ int main(void) {
             Vec3 pixel_pos = vec3_add(&pixel_u_pos, &pixel_v_pos);
             Vec3 pixel_center = vec3_add(&pixel00_loc, &pixel_pos);
             Vec3 ray_direction = vec3_subtract(&pixel_center, &camera_center);
-
             Ray r = {camera_center, ray_direction};
             
             Color pixel_color = ray_color(&r);
