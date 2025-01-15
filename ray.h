@@ -7,6 +7,6 @@ typedef struct ray {
     Vec3 direction;
 } Ray;
 
-bool hit_sphere(const Vec3 *center, double radius, const Ray *r);
+double hit_sphere(const Vec3 *center, double radius, const Ray *r);
 Vec3 ray_at(const Ray *r, double t);
 Color ray_color(const Ray *r);
