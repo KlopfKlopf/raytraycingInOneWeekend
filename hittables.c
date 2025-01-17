@@ -137,13 +137,14 @@ void hittables_clear(Hittables *hittables) {
     free(hittables);
 }
 
-bool hittables_hit(const Hittables *hittables, const Ray *r, double ray_tmin, double ray_tmax, Hit_Record *rec) {
+bool hittables_hit(const Hittables *hittables, const Ray *r, Interval ray_t, Hit_Record *rec) {
     Hit_Record temp_rec;
     bool hit_anything = false;
-    double closest_so_far = ray_tmax;
+    double closest_so_far = ray_t.max;
 
     for (size_t i = 0; i<hittables->size; i++) {
-        if (object_hit(hittables->objects[i], r, ray_tmin, closest_so_far, &temp_rec)) {
+        Interval interval = {ray_t.min, closest_so_far};
+        if (object_hit(hittables->objects[i], r, interval, &temp_rec)) {
             hit_anything = true;
             closest_so_far = temp_rec.t;
             *rec = temp_rec;
@@ -153,7 +154,7 @@ bool hittables_hit(const Hittables *hittables, const Ray *r, double ray_tmin, do
     return hit_anything;
 }
 
-bool object_hit(const Obj *obj, const Ray *r, double ray_tmin, double ray_tmax, Hit_Record *rec) {
+bool object_hit(const Obj *obj, const Ray *r, Interval ray_t, Hit_Record *rec) {
     switch (obj->kind) {
     case SPHERE:
         Sphere* sphere = obj->data;
@@ -172,9 +173,9 @@ bool object_hit(const Obj *obj, const Ray *r, double ray_tmin, double ray_tmax, 
 
         // Find the nearest root that lies in the acceptable range
         double root = (h - sqrtd) /a;
-        if (root <= ray_tmin || ray_tmax <= root) {
+        if (!surrounds(&ray_t, root)) {
             root = (h + sqrtd) *a;
-            if (root <= ray_tmin || ray_tmax <= root) {
+            if (!surrounds(&ray_t, root)) {
                 return false;
             }
         }
@@ -184,7 +185,6 @@ bool object_hit(const Obj *obj, const Ray *r, double ray_tmin, double ray_tmax, 
         
         Vec3 hitpoint_center_distance = vec3_subtract(&rec->point, &sphere->center);
         Vec3 outward_normal = vec3_scalar_divide(sphere->radius, &hitpoint_center_distance);
-        printf("Outward Normal: (%f, %f, %f)\n", outward_normal.x, outward_normal.y, outward_normal.z);
         hit_record_set_face_normal(r, &outward_normal, rec);
         return true;
 

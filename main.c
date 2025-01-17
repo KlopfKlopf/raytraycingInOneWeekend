@@ -5,7 +5,8 @@
 // Calculate the ray color.
 Color ray_color(const Ray *r, const Hittables *world) {
     Hit_Record rec;
-    if (hittables_hit(world, r, 0, RT_INFINITY, &rec)) {
+    Interval interval = {0, RT_INFINITY};
+    if (hittables_hit(world, r, interval, &rec)) {
         Color color = {1,1,1};
         Color rec_normal = {rec.normal.x, rec.normal.y, rec.normal.z};
         Color normal_color = color_add(&rec_normal, &color);
