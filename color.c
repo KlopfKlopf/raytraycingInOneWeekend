@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "color.h"
  
 void write_color(FILE *fstream, const Color *pixel_color){

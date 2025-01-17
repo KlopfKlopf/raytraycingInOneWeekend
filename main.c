@@ -1,8 +1,27 @@
-#include <stdio.h>
+#include "rtweekend.h"
+#include "hittables.h"
 
-#include "vec3.h"
-#include "color.h"
-#include "ray.h"
+
+// Calculate the ray color.
+Color ray_color(const Ray *r, const Hittables *world) {
+    Hit_Record rec;
+    if (hittables_hit(world, r, 0, RT_INFINITY, &rec)) {
+        Color color = {1,1,1};
+        Color rec_normal = {rec.normal.x, rec.normal.y, rec.normal.z};
+        Color normal_color = color_add(&rec_normal, &color);
+        return color_scalar_multiply(0.5, &normal_color);
+    }
+    
+    Vec3 unit_direction = vec3_unit_vector(&r->direction);
+    Color start_value = {1, 1, 1};
+    Color end_value = {0.5, 0.7, 1};
+    double a = 0.5 * (unit_direction.y + 1.0);
+
+    Color blended_start_value = color_scalar_multiply((1.0-a), &start_value);
+    Color blended_end_value = color_scalar_multiply(a, &end_value);
+    Color blended_color = color_add(&blended_start_value, &blended_end_value);
+    return blended_color;
+}
 
 int main(void) {
     
@@ -14,6 +33,20 @@ int main(void) {
     if (image_height < 1) {
         image_height = 1;
     }
+
+    //World
+
+
+    Hittables *world = init_hittables(10);
+    Vec3 pos_sp1 = {0,0,-1};
+    Vec3 pos_sp2 = {0,-100.5,-1};
+    Obj* sp1 = create_object(SPHERE, &pos_sp1);
+    Obj* sp2 = create_object(SPHERE, &pos_sp2);
+    resize_object(sp1, 0.5, 0.0, 0.0);
+    resize_object(sp2, 100.0, 0.0, 0.0);
+
+    hittables_add(world, sp1);
+    hittables_add(world, sp2);
 
     //Camera
 
@@ -61,10 +94,11 @@ int main(void) {
             Vec3 ray_direction = vec3_subtract(&pixel_center, &camera_center);
             Ray r = {camera_center, ray_direction};
             
-            Color pixel_color = ray_color(&r);
+            Color pixel_color = ray_color(&r, world);
             write_color(fstream, &pixel_color);
         }
     }
     fclose(fstream);
+    hittables_clear(world);
     return 0;
 }
