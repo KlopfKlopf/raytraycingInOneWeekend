@@ -4,14 +4,13 @@
 
 // Create Objects of different types at posititons with default size
 Obj* create_object(Obj_kind kind, Vec3 *position) {
+    Obj* obj;
+    obj = malloc(sizeof(Obj));
+    if (obj == NULL) {
+        exit(1);
+    }
     switch (kind) {
         case SPHERE:
-            Obj* obj;
-            obj = malloc(sizeof(Obj));
-            if (obj == NULL) {
-                free(obj);
-                exit(1);
-            }
             obj->refcount = 0;
             obj->kind = kind;
             Sphere *sphere = malloc(sizeof(Sphere));
@@ -22,8 +21,8 @@ Obj* create_object(Obj_kind kind, Vec3 *position) {
             sphere->center = *position;
             sphere->radius = 1; //Default Value 1
             obj->data = sphere;
-            return obj;
     }
+    return obj;
 }
 
 void resize_object(Obj *obj, double s1, double s2, double s3) {
@@ -187,7 +186,8 @@ bool object_hit(const Obj *obj, const Ray *r, Interval ray_t, Hit_Record *rec) {
         Vec3 outward_normal = vec3_scalar_divide(sphere->radius, &hitpoint_center_distance);
         hit_record_set_face_normal(r, &outward_normal, rec);
         return true;
-
+    default:
+        return false;
     }
 }
 
