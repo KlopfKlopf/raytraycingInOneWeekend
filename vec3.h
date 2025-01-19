@@ -6,6 +6,7 @@ typedef struct vec3 {
     double z;
 } Vec3;
 
+Vec3 new_vec3(double x, double y, double z);
 Vec3 vec3_negate(const Vec3 *v);
 Vec3 vec3_add(const Vec3 *v1, const Vec3 *v2);
 Vec3 vec3_subtract(const Vec3 *v1, const Vec3 *v2);

@@ -36,8 +36,8 @@ typedef struct sphere {
 bool object_hit(const Obj *obj, const Ray *r, Interval ray_t, Hit_Record *rec);
 bool hittables_hit(const Hittables *hittables, const Ray *r, Interval ray_t, Hit_Record *rec);
 void hit_record_set_face_normal(const Ray *r, const Vec3 *outward_normal, Hit_Record *rec);
-Obj* create_object(Obj_kind kind, Vec3 *position);
-void resize_object(Obj *obj, double s1, double s2, double s3);
+Obj* new_object(void);
+Obj* create_sphere(Vec3 postition, double radius);
 void add_object_ref(Obj *obj);
 void remove_object_ref(Obj *obj);
 void free_object_data(Obj *obj);

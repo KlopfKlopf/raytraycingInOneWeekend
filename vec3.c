@@ -2,6 +2,14 @@
 
 #include "vec3.h"
 
+Vec3 new_vec3(double x, double y, double z) {
+    Vec3 vec;
+    vec.x = x;
+    vec.y = y;
+    vec.z = z;
+    return vec;
+}
+
 // Negate the Vector and return the resulting Vector.
 Vec3 vec3_negate(const Vec3 *v) {
     Vec3 result;

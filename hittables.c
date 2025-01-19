@@ -3,38 +3,28 @@
 #include "stdlib.h"
 
 // Create Objects of different types at posititons with default size
-Obj* create_object(Obj_kind kind, Vec3 *position) {
+
+Obj* new_object(void) {
     Obj* obj;
     obj = malloc(sizeof(Obj));
     if (obj == NULL) {
         exit(1);
     }
-    switch (kind) {
-        case SPHERE:
-            obj->refcount = 0;
-            obj->kind = kind;
-            Sphere *sphere = malloc(sizeof(Sphere));
-            if (sphere == NULL) {
-                free(sphere);
-                exit(1);
-            }
-            sphere->center = *position;
-            sphere->radius = 1; //Default Value 1
-            obj->data = sphere;
-    }
     return obj;
 }
 
-void resize_object(Obj *obj, double s1, double s2, double s3) {
-    switch (obj->kind)
-    {
-        case SPHERE:
-            ((Sphere*)obj->data)->radius = fmax(0, s1);
-            break;
-    
-        default:
-            break;
+Obj* create_sphere(Vec3 position, double radius) {
+    Obj *obj = new_object();
+    obj->refcount = 0;
+    obj->kind = SPHERE;
+    Sphere *sphere = malloc(sizeof(Sphere));
+    if (sphere == NULL) {
+        exit(1);
     }
+    sphere->center = position;
+    sphere->radius = radius;
+    obj->data = sphere;
+    return obj;
 }
 
 void add_object_ref(Obj *obj) {

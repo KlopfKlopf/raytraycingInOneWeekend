@@ -22,13 +22,13 @@ void initialize(Camera *cam) {
     double focal_length = 1.0;
     double viewport_height = 2.0;
     double viewport_width = viewport_height * (((double)cam->image_width)/cam->image_height);
-    Vec3 camera_center = {0, 0, 0};
+    Vec3 camera_center = new_vec3(0,0,0);
     cam->center = camera_center;
-    Vec3 focal_point = {0, 0, focal_length};
+    Vec3 focal_point = new_vec3(0,0,focal_length);
 
     // Calculate the vectors across the horizontal and down the vertical viewport edges.
-    Vec3 viewport_u = {viewport_width, 0, 0};
-    Vec3 viewport_v = {0, -viewport_height, 0};
+    Vec3 viewport_u = new_vec3(viewport_width,0,0);
+    Vec3 viewport_v = new_vec3(0, -viewport_height, 0);
     Vec3 viewport_u_half = vec3_scalar_divide(2, &viewport_u);
     Vec3 viewport_v_half = vec3_scalar_divide(2, &viewport_v);
 
