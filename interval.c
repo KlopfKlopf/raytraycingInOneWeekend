@@ -11,3 +11,9 @@ bool contains(const Interval *i, double x) {
 bool surrounds(const Interval *i, double x) {
     return i->min < x && x < i->max;
 }
+
+double clamp(const Interval *i, double x) {
+    if (x < i->min) return i->min;
+    if (x > i->max) return i->max;
+    return x;
+}

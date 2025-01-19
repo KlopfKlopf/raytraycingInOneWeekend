@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include <stdlib.h>
 #include "rtweekend.h"
 #include "ray.h"
 #include "interval.h"

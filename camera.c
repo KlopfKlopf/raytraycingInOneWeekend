@@ -1,14 +1,14 @@
-#include <stdlib.h>
 #include "camera.h"
 
 
-Camera* new_camera(double aspect_ratio, int image_width) {
+Camera* new_camera(double aspect_ratio, int image_width, int samples_per_pixel) {
     Camera *cam = calloc(1, sizeof(Camera));
     if (cam == NULL) {
         exit(1);
     }
     cam->aspect_ratio = aspect_ratio;
     cam->image_width = image_width;
+    cam->samples_per_pixel = samples_per_pixel;
     return cam;
 }
 
@@ -18,6 +18,8 @@ void initialize(Camera *cam) {
     if (cam->image_height < 1) {
         cam->image_height = 1;
     }
+
+    cam->pixel_samples_scale = 1.0 / cam->samples_per_pixel;
 
     double focal_length = 1.0;
     double viewport_height = 2.0;
@@ -61,15 +63,14 @@ void render(Camera *cam, const Hittables *world) {
 
     for (int j = 0; j < cam->image_height; j++) {
         for (int i = 0; i < cam->image_width; i++) {
-            Vec3 pixel_u_pos = vec3_scalar_multiply(i, &cam->pixel_delta_u);
-            Vec3 pixel_v_pos = vec3_scalar_multiply(j, &cam->pixel_delta_v);
-            Vec3 pixel_pos = vec3_add(&pixel_u_pos, &pixel_v_pos);
-            Vec3 pixel_center = vec3_add(&cam->pixel00_loc, &pixel_pos);
-            Vec3 ray_direction = vec3_subtract(&pixel_center, &cam->center);
-            Ray r = {cam->center, ray_direction};
-            
-            Color pixel_color = ray_color(&r, world);
-            write_color(fstream, &pixel_color);
+            Color pixel_color = {.r = 0, .g = 0, .b = 0};
+            for (int sample = 0; sample < cam->samples_per_pixel; sample++) {
+                Ray r = get_ray(cam, i, j);
+                Color r_color = ray_color(&r, world);
+                pixel_color = color_add(&pixel_color, &r_color);
+            }
+            Color sampled_pixel_color = color_scalar_multiply(cam->pixel_samples_scale, &pixel_color);
+            write_color(fstream, &sampled_pixel_color);
         }
     }
     fclose(fstream);
@@ -95,4 +96,26 @@ Color ray_color(const Ray *r, const Hittables *world) {
     Color blended_end_value = color_scalar_multiply(a, &end_value);
     Color blended_color = color_add(&blended_start_value, &blended_end_value);
     return blended_color;
+}
+
+Vec3 sample_square(void) {
+    // Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
+    double x = random_double() - 0.5;
+    double y = random_double() - 0.5;
+    double z = 0;
+    return new_vec3(x, y, z);
+}
+
+Ray get_ray(const Camera *cam, int i, int j) {
+    Vec3 offset = sample_square();
+    Vec3 offset_pixel_delta_u = vec3_scalar_multiply((i + offset.x), &cam->pixel_delta_u);
+    Vec3 offset_pixel_delta_v = vec3_scalar_multiply((j + offset.y), &cam->pixel_delta_v);
+    Vec3 offset_u_v = vec3_add(&offset_pixel_delta_u, &offset_pixel_delta_v);
+    Vec3 pixel_sample = vec3_add(&cam->pixel00_loc, &offset_u_v);
+
+    Vec3 ray_origin = cam->center;
+    Vec3 ray_direction = vec3_subtract(&pixel_sample, &ray_origin);
+    Ray r = {.origin = ray_origin, .direction = ray_direction};
+
+    return r; 
 }

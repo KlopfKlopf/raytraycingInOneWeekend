@@ -11,7 +11,7 @@ int main(void) {
     hittables_add(world, sp1);
     hittables_add(world, sp2);
 
-    Camera *cam = new_camera(16.0/9.0, 400);
+    Camera *cam = new_camera(16.0/9.0, 400, 100);
     render(cam, world);
 
     hittables_clear(world);

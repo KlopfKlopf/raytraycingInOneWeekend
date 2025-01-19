@@ -1,13 +1,16 @@
 #include "color.h"
- 
+
 void write_color(FILE *fstream, const Color *pixel_color){
     double r = pixel_color->r;
     double g = pixel_color->g;
     double b = pixel_color->b;
 
-    int rbyte= (int)255.999*r;
-    int gbyte= (int)255.999*g;
-    int bbyte= (int)255.999*b;
+    // Translate the [0, 1] component values to the byte range [0, 255].
+    static const Interval intensity = {.min = 0.000, .max = 0.999};
+
+    int rbyte= (int)256*clamp(&intensity, r);
+    int gbyte= (int)256*clamp(&intensity, g);
+    int bbyte= (int)256*clamp(&intensity, b);
 
     fprintf(fstream, "%d %d %d\n", rbyte, gbyte, bbyte);
 }

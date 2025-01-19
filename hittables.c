@@ -1,6 +1,4 @@
-#include <math.h>
 #include "hittables.h"
-#include "stdlib.h"
 
 // Create Objects of different types at posititons with default size
 
@@ -10,20 +8,22 @@ Obj* new_object(void) {
     if (obj == NULL) {
         exit(1);
     }
+    obj->refcount = 0;
     return obj;
 }
 
 Obj* create_sphere(Vec3 position, double radius) {
     Obj *obj = new_object();
-    obj->refcount = 0;
     obj->kind = SPHERE;
     Sphere *sphere = malloc(sizeof(Sphere));
     if (sphere == NULL) {
+        free(obj);
         exit(1);
     }
     sphere->center = position;
     sphere->radius = radius;
     obj->data = sphere;
+    add_object_ref(obj);
     return obj;
 }
 
