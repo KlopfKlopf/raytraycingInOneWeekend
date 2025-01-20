@@ -30,3 +30,8 @@ Color color_add(const Color *c1, const Color *c2) {
     result.b = c1->b + c2->b;
     return result;
 }
+
+Color new_color(double r, double g, double b) {
+    Color color = {.r = r, .g = g, .b = b};
+    return color;
+}

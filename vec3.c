@@ -81,6 +81,33 @@ Vec3 vec3_unit_vector(const Vec3 *v) {
     return result;
 }
 
+Vec3 vec3_random_unit_vector(void) {
+    while (true) {
+        Vec3 p = vec3_random_range(-1, 1);
+        double lensq = vec3_length_squared(&p);
+        if (-RT_INFINITY < lensq && lensq<= 1) {
+            return vec3_scalar_divide(sqrt(lensq), &p);
+        }
+    }
+}
+
+Vec3 vec3_random_on_hemisphere(const Vec3 *normal) {
+    Vec3 on_unit_sphere = vec3_random_unit_vector();
+    if(vec3_dot(&on_unit_sphere, normal) > 0.0) {
+        return on_unit_sphere;
+    } else {
+        return vec3_negate(&on_unit_sphere);
+    }
+}
+
+Vec3 vec3_random(void) {
+    return new_vec3(random_double(), random_double(), random_double());
+}
+
+Vec3 vec3_random_range(double min, double max) {
+    return new_vec3(random_double_range(min, max), random_double_range(min, max), random_double_range(min, max));
+}
+
 // Calculate the length of the Vector.
 double vec3_length(const Vec3 *v) {
     return sqrt(vec3_length_squared(v));

@@ -1,7 +1,7 @@
 #include "camera.h"
 
 
-Camera* new_camera(double aspect_ratio, int image_width, int samples_per_pixel) {
+Camera* new_camera(double aspect_ratio, int image_width, int samples_per_pixel, int max_depth) {
     Camera *cam = calloc(1, sizeof(Camera));
     if (cam == NULL) {
         exit(1);
@@ -9,6 +9,7 @@ Camera* new_camera(double aspect_ratio, int image_width, int samples_per_pixel) 
     cam->aspect_ratio = aspect_ratio;
     cam->image_width = image_width;
     cam->samples_per_pixel = samples_per_pixel;
+    cam->max_depth = max_depth;
     return cam;
 }
 
@@ -66,7 +67,7 @@ void render(Camera *cam, const Hittables *world) {
             Color pixel_color = {.r = 0, .g = 0, .b = 0};
             for (int sample = 0; sample < cam->samples_per_pixel; sample++) {
                 Ray r = get_ray(cam, i, j);
-                Color r_color = ray_color(&r, world);
+                Color r_color = ray_color(&r, cam->max_depth, world);
                 pixel_color = color_add(&pixel_color, &r_color);
             }
             Color sampled_pixel_color = color_scalar_multiply(cam->pixel_samples_scale, &pixel_color);
@@ -77,14 +78,17 @@ void render(Camera *cam, const Hittables *world) {
 }
 
 // Calculate the ray color.
-Color ray_color(const Ray *r, const Hittables *world) {
+Color ray_color(const Ray *r, int depth, const Hittables *world) {
+    if (depth <= 0) {
+        return new_color(0,0,0);
+    }
     Hit_Record rec;
-    Interval interval = {0, RT_INFINITY};
+    Interval interval = {0.001, RT_INFINITY};
     if (hittables_hit(world, r, interval, &rec)) {
-        Color color = {1,1,1};
-        Color rec_normal = {rec.normal.x, rec.normal.y, rec.normal.z};
-        Color normal_color = color_add(&rec_normal, &color);
-        return color_scalar_multiply(0.5, &normal_color);
+        Vec3 direction = vec3_random_on_hemisphere(&rec.normal);
+        Ray ray_bounce = {.origin = rec.point, .direction = direction};
+        Color ray_bounce_color = ray_color(&ray_bounce, depth - 1, world);
+        return color_scalar_multiply(0.5, &ray_bounce_color);
     }
     
     Vec3 unit_direction = vec3_unit_vector(&r->direction);
