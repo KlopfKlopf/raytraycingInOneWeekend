@@ -51,7 +51,7 @@ void initialize(Camera *cam) {
 void render(Camera *cam, const Hittables *world) {
     initialize(cam);
 
-    FILE *fstream = fopen("output.ppm", "w");
+    FILE *fstream = fopen("./Build/output.ppm", "w");
     if (fstream == NULL) {
         fprintf(stderr, "Error while opening the file.\n");
         return;
