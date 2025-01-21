@@ -5,6 +5,11 @@ void write_color(FILE *fstream, const Color *pixel_color){
     double g = pixel_color->g;
     double b = pixel_color->b;
 
+    // Apply a linear to gamma transform for gamma 2
+
+    r = linear_to_gamma(r);
+    g = linear_to_gamma(g);
+    b = linear_to_gamma(b);
     // Translate the [0, 1] component values to the byte range [0, 255].
     static const Interval intensity = {.min = 0.000, .max = 0.999};
 
@@ -34,4 +39,11 @@ Color color_add(const Color *c1, const Color *c2) {
 Color new_color(double r, double g, double b) {
     Color color = {.r = r, .g = g, .b = b};
     return color;
+}
+
+double linear_to_gamma(double linear_component) {
+    if (linear_component > 0) {
+        return sqrt(linear_component);
+    }
+    return 0.0;
 }
