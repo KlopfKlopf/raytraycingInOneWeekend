@@ -100,6 +100,13 @@ Vec3 vec3_random_on_hemisphere(const Vec3 *normal) {
     }
 }
 
+Vec3 vec3_reflect(const Vec3 *v, const Vec3 *n) {
+    double dot_result = vec3_dot(v, n);
+    Vec3 scaled_unit_vector = vec3_scalar_multiply(dot_result, n);
+    Vec3 outward_scaled_unit_vec = vec3_scalar_multiply(2, &scaled_unit_vector);
+    return vec3_subtract(v, &outward_scaled_unit_vec);
+}
+
 Vec3 vec3_random(void) {
     return new_vec3(random_double(), random_double(), random_double());
 }
@@ -121,4 +128,9 @@ double vec3_length_squared(const Vec3 *v) {
 // Calculate the Dot product of the given Vectors.
 double vec3_dot(const Vec3 *v1, const Vec3 *v2) {
     return v1->x * v2->x + v1->y * v2->y + v1->z * v2->z;
+}
+
+bool vec3_near_zero(const Vec3 *v) {
+    double s = 1e-8;
+    return (fabs(v->x) < s) && (fabs(v->y) < s) && (fabs(v->z) < s);
 }

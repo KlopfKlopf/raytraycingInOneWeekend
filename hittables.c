@@ -1,4 +1,5 @@
 #include "hittables.h"
+#include "materials.h"
 
 // Create Objects of different types at posititons with default size
 
@@ -12,7 +13,7 @@ Obj* new_object(void) {
     return obj;
 }
 
-Obj* create_sphere(Vec3 position, double radius) {
+Obj* create_sphere(Vec3 position, double radius, Material *mat) {
     Obj *obj = new_object();
     obj->kind = SPHERE;
     Sphere *sphere = malloc(sizeof(Sphere));
@@ -22,6 +23,7 @@ Obj* create_sphere(Vec3 position, double radius) {
     }
     sphere->center = position;
     sphere->radius = radius;
+    sphere->material = mat;
     obj->data = sphere;
     add_object_ref(obj);
     return obj;
@@ -49,7 +51,15 @@ void free_object_data(Obj *obj) {
         if (obj->data == NULL) {
             return;
         }
-        free(obj->data);
+        switch (obj->kind) {
+            case SPHERE:
+                Sphere* sphere = (Sphere*)obj->data;
+                remove_material_ref(sphere->material);
+                free(obj->data);
+                break;
+            default:
+                break;
+        }
 }
 
 Hittables* init_hittables(size_t capacity) {
@@ -175,6 +185,7 @@ bool object_hit(const Obj *obj, const Ray *r, Interval ray_t, Hit_Record *rec) {
         Vec3 hitpoint_center_distance = vec3_subtract(&rec->point, &sphere->center);
         Vec3 outward_normal = vec3_scalar_divide(sphere->radius, &hitpoint_center_distance);
         hit_record_set_face_normal(r, &outward_normal, rec);
+        rec->mat = sphere->material;
         return true;
     default:
         return false;

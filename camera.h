@@ -5,6 +5,7 @@
 #include "hittables.h"
 #include "color.h"
 #include "ray.h"
+#include "materials.h"
 
 typedef struct camera {
     double aspect_ratio;

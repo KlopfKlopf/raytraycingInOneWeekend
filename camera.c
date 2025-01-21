@@ -85,11 +85,13 @@ Color ray_color(const Ray *r, int depth, const Hittables *world) {
     Hit_Record rec;
     Interval interval = {0.001, RT_INFINITY};
     if (hittables_hit(world, r, interval, &rec)) {
-        Vec3 random_unit_vec = vec3_random_unit_vector();
-        Vec3 direction = vec3_add(&rec.normal, &random_unit_vec);
-        Ray ray_bounce = {.origin = rec.point, .direction = direction};
-        Color ray_bounce_color = ray_color(&ray_bounce, depth - 1, world);
-        return color_scalar_multiply(0.1, &ray_bounce_color);
+        Ray scattered;
+        Color attenuation;
+        if (scatter(r, &rec, &attenuation, &scattered)) {
+            Color scatter_color = ray_color(&scattered, depth -1, world);
+            return color_multiply(&attenuation, &scatter_color);
+        }
+        return new_color(0, 0, 0);
     }
     
     Vec3 unit_direction = vec3_unit_vector(&r->direction);

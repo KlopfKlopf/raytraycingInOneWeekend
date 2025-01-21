@@ -20,6 +20,14 @@ void write_color(FILE *fstream, const Color *pixel_color){
     fprintf(fstream, "%d %d %d\n", rbyte, gbyte, bbyte);
 }
 
+Color color_multiply(Color *c1, Color *c2) {
+    Color result;
+    result.r = c1->r * c2->r;
+    result.g = c1->g * c2->g;
+    result.b = c1->b * c2->b;
+    return result;
+}
+
 Color color_scalar_multiply(double s, const Color *c) {
     Color result;
     result.r = c->r * s;
