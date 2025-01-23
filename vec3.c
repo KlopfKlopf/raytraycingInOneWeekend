@@ -107,6 +107,17 @@ Vec3 vec3_reflect(const Vec3 *v, const Vec3 *n) {
     return vec3_subtract(v, &outward_scaled_unit_vec);
 }
 
+Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat) {
+    Vec3 negative_uv = vec3_negate(uv);
+    double cos_theta = fmin(vec3_dot(&negative_uv, n), 1.0);
+    Vec3 refracted_normal = vec3_scalar_multiply(cos_theta, n);
+    Vec3 refracted_vec = vec3_add(uv, &refracted_normal);
+    Vec3 r_out_perp = vec3_scalar_multiply(etai_over_etat, &refracted_vec);
+    Vec3 r_out_parallel = vec3_scalar_multiply(-sqrt((fabs(1.0 - vec3_length_squared(&r_out_perp)))), n);
+    Vec3 refracted = vec3_add(&r_out_perp, &r_out_parallel);
+    return refracted;
+}
+
 Vec3 vec3_random(void) {
     return new_vec3(random_double(), random_double(), random_double());
 }

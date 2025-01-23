@@ -21,6 +21,7 @@ Vec3 vec3_unit_vector(const Vec3 *v);
 Vec3 vec3_random_unit_vector(void);
 Vec3 vec3_random_on_hemisphere(const Vec3 *normal);
 Vec3 vec3_reflect(const Vec3 *v, const Vec3 *n);
+Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat);
 Vec3 vec3_random(void);
 Vec3 vec3_random_range(double min, double max);
 double vec3_dot(const Vec3 *v1, const Vec3 *v2);
