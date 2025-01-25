@@ -102,18 +102,33 @@ bool scatter(const Ray *r, const Hit_Record *rec, Color *attenuation, Ray *scatt
             return (vec3_dot(&scattered->direction, &rec->normal) > 0);
         case DIELECTRIC:
             Dielectric *refractive_mat = (Dielectric *)mat->data;
-            *attenuation = new_color(1.0, 1.0, 1.0);
-            double ri;
-            if (rec->front_face) {
-                ri = (1.0/refractive_mat->refraction_index);
-            } else {
-                ri = refractive_mat->refraction_index;
-            }
+            double ri = rec->front_face ? (1.0/refractive_mat->refraction_index) : refractive_mat->refraction_index;
             Vec3 unit_direction = vec3_unit_vector(&r->direction);
-            Vec3 refracted = vec3_refract(&unit_direction, &rec->normal, ri);
-            *scattered = (Ray){.origin = rec->point, refracted};
+            Vec3 neg_unit_dir = vec3_negate(&unit_direction);
+            double cos_theta = fmin(vec3_dot(&neg_unit_dir, &rec->normal), 1.0);
+            double sin_theta = sqrt(1.0 - (cos_theta * cos_theta));
+
+            bool cannot_refract = ri * sin_theta > 1.0;
+
+            Vec3 direction = new_vec3(0, 0, 0);
+
+            if (cannot_refract || reflectance(cos_theta, ri) > random_double()) {
+                direction = vec3_reflect(&unit_direction, &rec->normal);
+            } else {
+                direction = vec3_refract(&unit_direction, &rec->normal, ri);
+            }
+            
+            *attenuation = new_color(1.0, 1.0, 1.0);
+            *scattered = (Ray){.origin = rec->point,.direction = direction};
             return true; 
         default:
             return false;
     }
+}
+
+double reflectance(double cosine, double refraction_index) {
+    // Use Schlick's approximation for reflectance.
+    double r0 = (1 - refraction_index) / (1 + refraction_index);
+    r0 = r0*r0;
+    return r0 + (1-r0)*pow((1-cosine), 5);
 }

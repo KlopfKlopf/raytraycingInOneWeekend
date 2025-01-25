@@ -85,7 +85,7 @@ Vec3 vec3_random_unit_vector(void) {
     while (true) {
         Vec3 p = vec3_random_range(-1, 1);
         double lensq = vec3_length_squared(&p);
-        if (-RT_INFINITY < lensq && lensq<= 1) {
+        if (1e-160 < lensq && lensq<= 1) {
             return vec3_scalar_divide(sqrt(lensq), &p);
         }
     }
@@ -113,7 +113,9 @@ Vec3 vec3_refract(const Vec3 *uv, const Vec3 *n, double etai_over_etat) {
     Vec3 refracted_normal = vec3_scalar_multiply(cos_theta, n);
     Vec3 refracted_vec = vec3_add(uv, &refracted_normal);
     Vec3 r_out_perp = vec3_scalar_multiply(etai_over_etat, &refracted_vec);
-    Vec3 r_out_parallel = vec3_scalar_multiply(-sqrt((fabs(1.0 - vec3_length_squared(&r_out_perp)))), n);
+    double discriminant = fabs((1.0 - vec3_length_squared(&r_out_perp)));
+    double parallel_magnitude = sqrt(discriminant);
+    Vec3 r_out_parallel = vec3_scalar_multiply(-parallel_magnitude, n);
     Vec3 refracted = vec3_add(&r_out_perp, &r_out_parallel);
     return refracted;
 }

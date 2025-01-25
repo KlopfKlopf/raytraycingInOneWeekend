@@ -39,3 +39,4 @@ void add_material_ref(Material *mat);
 void remove_material_ref(Material *mat);
 void free_material_data(Material *mat);
 bool scatter(const Ray *r, const Hit_Record *rec, Color *attenuation, Ray *scattered);
+double reflectance(double cosine, double refraction_index);

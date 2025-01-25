@@ -80,7 +80,7 @@ void render(Camera *cam, const Hittables *world) {
 // Calculate the ray color.
 Color ray_color(const Ray *r, int depth, const Hittables *world) {
     if (depth <= 0) {
-        return new_color(0,0,0);
+        return new_color(0, 0, 0);
     }
     Hit_Record rec;
     Interval interval = {0.001, RT_INFINITY};
@@ -88,7 +88,7 @@ Color ray_color(const Ray *r, int depth, const Hittables *world) {
         Ray scattered;
         Color attenuation;
         if (scatter(r, &rec, &attenuation, &scattered)) {
-            Color scatter_color = ray_color(&scattered, depth -1, world);
+            Color scatter_color = ray_color(&scattered, depth - 1, world);
             return color_multiply(&attenuation, &scatter_color);
         }
         return new_color(0, 0, 0);

@@ -173,7 +173,7 @@ bool object_hit(const Obj *obj, const Ray *r, Interval ray_t, Hit_Record *rec) {
         // Find the nearest root that lies in the acceptable range
         double root = (h - sqrtd) /a;
         if (!surrounds(&ray_t, root)) {
-            root = (h + sqrtd) *a;
+            root = (h + sqrtd) / a;
             if (!surrounds(&ray_t, root)) {
                 return false;
             }
